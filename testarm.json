@@ -6,20 +6,20 @@
     "variables": {},
     "resources": [
         {
-            "name": "[toLower('lyllavmVM1storage')]",
+            "name": "[toLower('lyllastorage')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
             "location": "[resourceGroup().location]",
             "tags": {
-                "displayNamlyllavm Storage Account"
+                "displayName": "lylla Storage Account"
             },
             "sku": {
                 "name": "Standard_LRS"
             },
-            "kind": "StorageV2"
+            "kind": "Storage"
         },
         {
-            "namlyllavm-PublicIP",
+            "name": "lylla-PublicIP",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
@@ -29,12 +29,12 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[toLolyllavm')]"
+                    "domainNameLabel": "[toLower('lylla')]"
                 }
             }
         },
         {
-            "namlyllavm-nsg",
+            "name": "lylla-nsg",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
@@ -58,15 +58,15 @@
             }
         },
         {
-            "namlyllavm-VirtualNetwork",
+            "name": "lylla-VirtualNetwork",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGrouplyllavm-nsg')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'lylla-nsg')]"
             ],
             "tags": {
-                "displayNamlyllavm-VirtualNetwork"
+                "displayName": "lylla-VirtualNetwork"
             },
             "properties": {
                 "addressSpace": {
@@ -76,11 +76,11 @@
                 },
                 "subnets": [
                     {
-                        "namlyllavm-VirtualNetwork-Subnet",
+                        "name": "lylla-VirtualNetwork-Subnet",
                         "properties": {
                             "addressPrefix": "10.0.0.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGrouplyllavm-nsg')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'lylla-nsg')]"
                             }
                         }
                     }
@@ -88,16 +88,16 @@
             }
         },
         {
-            "namlyllavm-NetworkInterface",
+            "name": "lylla-NetworkInterface",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresselyllavm-PublicIP')]",
-                "[resourceId('Microsoft.Network/virtualNetworklyllavm-VirtualNetwork')]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'lylla-PublicIP')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'lylla-VirtualNetwork')]"
             ],
             "tags": {
-                "displayNamlyllavm-NetworkInterface"
+                "displayName": "lylla-NetworkInterface"
             },
             "properties": {
                 "ipConfigurations": [
@@ -106,10 +106,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresselyllavm-PublicIP')]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'lylla-PublicIP')]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnetlyllavm-VirtualNetworlyllavm-VirtualNetwork-Subnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'lylla-VirtualNetwork', 'lylla-VirtualNetwork-Subnet')]"
                             }
                         }
                     }
@@ -117,22 +117,22 @@
             }
         },
         {
-            "namlyllavm",
+            "name": "lylla",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfacelyllavm-NetworkInterface')]"
+                "[resourceId('Microsoft.Network/networkInterfaces', 'lylla-NetworkInterface')]"
             ],
             "tags": {
-                "displayNamlyllavm"
+                "displayName": "lylla"
             },
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "Standard_A2_v2"
                 },
                 "osProfile": {
-                    "computerNamlyllavm",
+                    "computerName": "lylla",
                     "adminUsername": "lylla",
                     "adminPassword": "Jevis@ambronay"
                 },
@@ -144,7 +144,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "namlyllavm-OSDisk",
+                        "name": "lylla-OSDisk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     }
@@ -152,14 +152,14 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfacelyllavm-NetworkInterface')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'lylla-NetworkInterface')]"
                         }
                     ]
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLolyllavmstorage'))).primaryEndpoints.blob]"
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('lyllastorage'))).primaryEndpoints.blob]"
                     }
                 }
             }
